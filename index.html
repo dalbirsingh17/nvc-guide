@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pause · An NVC Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Karla:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mist:#ECEFE9;
+  --card:#F8F9F6;
+  --ink:#2E3A33;
+  --ink-soft:#5A6A5F;
+  --sage:#9AAA9C;
+  --line:#D8DED4;
+  --dusk:#54707F;
+  --dusk-deep:#3E5866;
+  --dusk-tint:#E3EAED;
+  --amber:#8C6B3F;
+  --amber-tint:#F2ECDF;
+  --radius:14px;
+  --font-display:"Newsreader", Georgia, serif;
+  --font-body:"Karla", -apple-system, "Segoe UI", sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--mist);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:16.5px;
+  line-height:1.55;
+  min-height:100dvh;
+}
+.wrap{
+  max-width:600px;
+  margin:0 auto;
+  padding:20px 20px 96px;
+}
+/* ---------- header ---------- */
+header{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding:8px 2px 20px;
+}
+.brand{
+  font-family:var(--font-display);
+  font-weight:500;font-size:20px;letter-spacing:.01em;
+}
+.brand em{font-style:italic;color:var(--dusk)}
+.header-sub{
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-soft);
+}
+/* ---------- progress ---------- */
+.progress{
+  display:flex;gap:6px;margin-bottom:26px;
+}
+.progress .p{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;
+  font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--sage);cursor:default;background:none;border:none;
+  font-family:var(--font-body);
+}
+.progress .p .bar{
+  width:100%;height:3px;border-radius:2px;background:var(--line);
+  transition:background .3s;
+}
+.progress .p.done{color:var(--ink-soft);cursor:pointer}
+.progress .p.done .bar{background:var(--sage)}
+.progress .p.active{color:var(--dusk-deep);font-weight:600}
+.progress .p.active .bar{background:var(--dusk)}
+/* ---------- screens ---------- */
+.screen{display:none;animation:rise .35s ease both}
+.screen.on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .screen{animation:none}
+  *{transition:none !important;animation-duration:.01s !important}
+}
+.eyebrow{
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dusk);font-weight:600;margin-bottom:8px;
+}
+h1{
+  font-family:var(--font-display);
+  font-weight:400;font-size:clamp(28px,6vw,36px);line-height:1.15;
+  margin-bottom:10px;letter-spacing:-.01em;
+}
+h1 em{font-style:italic}
+.lede{color:var(--ink-soft);margin-bottom:22px;max-width:46ch}
+/* ---------- cards & guidance ---------- */
+.card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);padding:18px;margin-bottom:16px;
+}
+.hint{
+  border-left:3px solid var(--sage);
+  padding:2px 0 2px 14px;margin:14px 0 18px;
+  color:var(--ink-soft);font-size:15px;
+}
+.hint b{color:var(--ink);font-weight:600}
+textarea,input[type=text]{
+  width:100%;font-family:var(--font-body);font-size:17px;color:var(--ink);
+  background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:13px 14px;resize:vertical;line-height:1.5;
+}
+textarea:focus,input:focus{outline:2px solid var(--dusk);outline-offset:1px;border-color:var(--dusk)}
+textarea::placeholder,input::placeholder{color:#A6B0A8}
+.prefix{
+  font-family:var(--font-display);font-style:italic;font-size:19px;
+  color:var(--ink);margin-bottom:8px;display:block;
+}
+/* ---------- chips ---------- */
+.group{margin-bottom:14px}
+.group-label{
+  font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-soft);margin-bottom:8px;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+}
+.group-label::after{content:"";flex:1;height:1px;background:var(--line)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  font-family:var(--font-body);font-size:14.5px;color:var(--ink);
+  background:#fff;border:1px solid var(--line);border-radius:999px;
+  padding:7px 14px;cursor:pointer;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.chip:hover{border-color:var(--sage)}
+.chip.sel{
+  background:var(--dusk);border-color:var(--dusk);color:#fff;font-weight:500;
+}
+.chip:focus-visible{outline:2px solid var(--dusk-deep);outline-offset:2px}
+/* selected summary strip */
+.picked{
+  min-height:24px;margin:4px 0 16px;font-family:var(--font-display);
+  font-style:italic;font-size:18px;color:var(--dusk-deep);
+}
+.picked span.none{color:var(--sage);font-family:var(--font-body);font-style:normal;font-size:14px}
+/* ---------- translator (evaluations) ---------- */
+details.translator{
+  background:var(--amber-tint);border:1px solid #E3D9C2;
+  border-radius:var(--radius);margin:6px 0 18px;
+}
+details.translator summary{
+  cursor:pointer;padding:14px 16px;font-weight:600;font-size:15px;
+  color:var(--amber);list-style:none;display:flex;gap:10px;align-items:center;
+}
+details.translator summary::-webkit-details-marker{display:none}
+details.translator summary::before{content:"⚠";font-size:15px}
+details.translator[open] summary{border-bottom:1px solid #E3D9C2}
+.translator-body{padding:14px 16px 16px}
+.translator-body p{font-size:14.5px;color:var(--ink-soft);margin-bottom:12px}
+.eval-result{
+  background:#fff;border-radius:10px;padding:14px;margin-top:12px;
+  border:1px solid #E3D9C2;display:none;
+}
+.eval-result.on{display:block}
+.eval-result h4{
+  font-family:var(--font-display);font-style:italic;font-weight:500;
+  font-size:18px;margin-bottom:8px;
+}
+.eval-result .row{font-size:14.5px;margin-bottom:6px}
+.eval-result .row b{color:var(--dusk-deep)}
+.eval-result .apply{
+  margin-top:10px;font-size:13.5px;font-weight:600;color:var(--dusk);
+  background:var(--dusk-tint);border:none;border-radius:8px;
+  padding:8px 12px;cursor:pointer;font-family:var(--font-body);
+}
+/* ---------- request step ---------- */
+.choice{
+  display:grid;gap:12px;margin-bottom:16px;
+}
+.choice-card{
+  text-align:left;background:var(--card);border:1.5px solid var(--line);
+  border-radius:var(--radius);padding:16px;cursor:pointer;
+  font-family:var(--font-body);transition:border-color .15s, background .15s;
+}
+.choice-card:hover{border-color:var(--sage)}
+.choice-card.sel{border-color:var(--dusk);background:var(--dusk-tint)}
+.choice-card .t{font-weight:600;font-size:15.5px;margin-bottom:4px;color:var(--ink)}
+.choice-card .d{font-size:14px;color:var(--ink-soft)}
+.choice-card .q{
+  font-family:var(--font-display);font-style:italic;font-size:16.5px;
+  margin-top:6px;color:var(--dusk-deep);
+}
+/* ---------- statement ---------- */
+.statement{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:24px 22px;font-family:var(--font-display);font-size:21px;
+  line-height:1.6;margin-bottom:10px;
+}
+.statement .slot{color:var(--dusk-deep);font-style:italic}
+.statement .frame{color:var(--ink-soft)}
+.meta{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:13.5px;color:var(--ink-soft);margin-bottom:20px;padding:0 4px;
+}
+.meta .ok{color:#4A7A5A}
+.meta .over{color:var(--amber)}
+/* ---------- nav / buttons ---------- */
+.nav{display:flex;gap:10px;margin-top:22px}
+.btn{
+  font-family:var(--font-body);font-size:16px;font-weight:600;
+  border-radius:12px;padding:14px 22px;cursor:pointer;border:none;
+  transition:transform .1s, background .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--dusk);color:#fff;flex:1}
+.btn-primary:hover{background:var(--dusk-deep)}
+.btn-ghost{background:transparent;color:var(--ink-soft);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--sage);color:var(--ink)}
+.btn:focus-visible{outline:2px solid var(--dusk-deep);outline-offset:2px}
+.btn[disabled]{opacity:.45;cursor:default}
+/* ---------- breath opener ---------- */
+#s-breath{text-align:center;padding-top:6vh}
+.orb-stage{height:220px;display:flex;align-items:center;justify-content:center;margin:30px 0 10px}
+.orb{
+  width:110px;height:110px;border-radius:50%;
+  background:radial-gradient(circle at 38% 34%, #7E97A4, var(--dusk) 65%, var(--dusk-deep));
+  animation:breathe 8s ease-in-out infinite;
+  box-shadow:0 0 0 18px rgba(84,112,127,.08), 0 0 0 38px rgba(84,112,127,.04);
+}
+@keyframes breathe{
+  0%{transform:scale(.72)} 45%{transform:scale(1.18)}
+  55%{transform:scale(1.18)} 100%{transform:scale(.72)}
+}
+@media (prefers-reduced-motion:reduce){.orb{animation:none}}
+#breath-word{
+  font-family:var(--font-display);font-style:italic;font-size:19px;
+  color:var(--ink-soft);height:28px;margin-bottom:26px;
+}
+/* ---------- footer ---------- */
+footer{
+  margin-top:44px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--sage);line-height:1.5;
+}
+.copied-toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--ink);color:var(--mist);font-size:14.5px;
+  padding:11px 20px;border-radius:999px;transition:transform .25s;
+  pointer-events:none;
+}
+.copied-toast.on{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="brand">Pause <em>· NVC</em></div>
+  <div class="header-sub">Rosenberg · 4 steps</div>
+</header>
+
+<div class="progress" id="progress" style="display:none">
+  <button class="p" data-step="1"><span>Observe</span><span class="bar"></span></button>
+  <button class="p" data-step="2"><span>Feel</span><span class="bar"></span></button>
+  <button class="p" data-step="3"><span>Need</span><span class="bar"></span></button>
+  <button class="p" data-step="4"><span>Request</span><span class="bar"></span></button>
+</div>
+
+<!-- ================= BREATH ================= -->
+<section class="screen on" id="s-breath">
+  <h1>Something happened.<br><em>Start with one breath.</em></h1>
+  <div class="orb-stage"><div class="orb" aria-hidden="true"></div></div>
+  <div id="breath-word">breathe in…</div>
+  <p class="lede" style="margin:0 auto 24px">This will walk you through the four NVC steps: what you observed, what you're feeling, the need underneath it, and a request you can actually make.</p>
+  <div class="nav" style="justify-content:center">
+    <button class="btn btn-primary" style="flex:0 0 auto;min-width:200px" onclick="go(1)">I'm ready</button>
+  </div>
+</section>
+
+<!-- ================= 1 OBSERVATION ================= -->
+<section class="screen" id="s-1">
+  <div class="eyebrow">Step 1 of 4 · Observation</div>
+  <h1>What actually <em>happened?</em></h1>
+  <p class="lede">Just the facts, as a camera or microphone would record them. Specific to this time and place.</p>
+  <div class="card">
+    <span class="prefix">"When I hear you say / see you…</span>
+    <textarea id="obs" rows="3" placeholder='e.g. "arrive 40 minutes after the time we agreed on" — not "show up late like always"'></textarea>
+  </div>
+  <div class="hint"><b>Watch for evaluation.</b> Words like <i>always, never, rude, lazy, ignoring me</i> are judgments, not observations. If a video camera couldn't have captured it, rewrite it.</div>
+  <div class="nav">
+    <button class="btn btn-ghost" onclick="go(0)">Back</button>
+    <button class="btn btn-primary" onclick="go(2)">Next: what I'm feeling</button>
+  </div>
+</section>
+
+<!-- ================= 2 FEELING ================= -->
+<section class="screen" id="s-2">
+  <div class="eyebrow">Step 2 of 4 · Feeling</div>
+  <h1>What's alive in you <em>right now?</em></h1>
+  <p class="lede">Feelings are body signals about your needs. Pick one or a few that ring true.</p>
+
+  <div class="picked" id="picked-feelings"><span class="none">Nothing selected yet</span></div>
+
+  <details class="translator">
+    <summary>It feels like they did something <i>to</i> me ("disrespected", "ignored"…)</summary>
+    <div class="translator-body">
+      <p>These words are evaluations of the other person, not feelings. Tap the one that fits and I'll translate it into feelings and needs.</p>
+      <div class="chips" id="eval-chips"></div>
+      <div class="eval-result" id="eval-result"></div>
+    </div>
+  </details>
+
+  <div id="feeling-groups"></div>
+
+  <div class="nav">
+    <button class="btn btn-ghost" onclick="go(1)">Back</button>
+    <button class="btn btn-primary" onclick="go(3)">Next: the need underneath</button>
+  </div>
+</section>
+
+<!-- ================= 3 NEED ================= -->
+<section class="screen" id="s-3">
+  <div class="eyebrow">Step 3 of 4 · Need</div>
+  <h1>What do you <em>need?</em></h1>
+  <p class="lede">Needs are universal — they name what would sustain or enrich life here, without naming any person or any specific action.</p>
+
+  <div class="picked" id="picked-needs"><span class="none">Nothing selected yet</span></div>
+  <div id="need-suggested"></div>
+  <div id="need-groups"></div>
+
+  <div class="hint"><b>Need vs. strategy.</b> "Respect" is a need. "You texting me back within an hour" is a strategy. Stay at the need level here — the strategy comes next.</div>
+
+  <div class="nav">
+    <button class="btn btn-ghost" onclick="go(2)">Back</button>
+    <button class="btn btn-primary" onclick="go(4)">Next: make a request</button>
+  </div>
+</section>
+
+<!-- ================= 4 REQUEST ================= -->
+<section class="screen" id="s-4">
+  <div class="eyebrow">Step 4 of 4 · Request</div>
+  <h1>Ask for something <em>doable.</em></h1>
+  <p class="lede">A request is concrete, positive (what you DO want), and possible right now. Not a demand, not a vague wish.</p>
+
+  <div class="choice" id="req-choices">
+    <button class="choice-card" data-req="c1">
+      <div class="t">Connection · check what landed</div>
+      <div class="q">"Could you tell me what you understand me to be saying?"</div>
+    </button>
+    <button class="choice-card" data-req="c2">
+      <div class="t">Connection · hear their side</div>
+      <div class="q">"Could you tell me how you feel when I tell you this?"</div>
+    </button>
+    <button class="choice-card" data-req="a1">
+      <div class="t">Action · right now</div>
+      <div class="q">"Would you be willing to ______?"</div>
+    </button>
+    <button class="choice-card" data-req="a2">
+      <div class="t">Action · in the future</div>
+      <div class="q">"Would you agree to ______?"</div>
+    </button>
+  </div>
+
+  <div class="card" id="action-fill" style="display:none">
+    <span class="prefix" id="action-prefix"></span>
+    <input type="text" id="action-text" placeholder="a specific, doable action — stated in the positive">
+  </div>
+
+  <div class="hint"><b>Request vs. demand.</b> If "no" would earn them punishment, it's a demand. Be ready to hear no and stay in the conversation.</div>
+
+  <div class="nav">
+    <button class="btn btn-ghost" onclick="go(3)">Back</button>
+    <button class="btn btn-primary" onclick="go(5)">See my statement</button>
+  </div>
+</section>
+
+<!-- ================= FINAL ================= -->
+<section class="screen" id="s-5">
+  <div class="eyebrow">Your statement</div>
+  <h1>Say it in <em>your</em> voice.</h1>
+  <p class="lede">Rosenberg's exercise suggests keeping the whole thing under about 50 words. Read it out loud once before you use it.</p>
+
+  <div class="statement" id="final-statement"></div>
+  <div class="meta">
+    <span id="word-count"></span>
+    <span>Observation → Feeling → Need → Request</span>
+  </div>
+
+  <div class="nav">
+    <button class="btn btn-ghost" onclick="go(4)">Back</button>
+    <button class="btn btn-primary" id="copy-btn" onclick="copyStatement()">Copy statement</button>
+  </div>
+  <div class="nav">
+    <button class="btn btn-ghost" style="flex:1" onclick="resetAll()">Start over</button>
+  </div>
+</section>
+
+<footer>
+  Based on <i>The 4 Components of Nonviolent Communication</i> by Marshall Rosenberg, Ph.D., and materials from the Center for Nonviolent Communication. For personal practice.
+</footer>
+</div>
+
+<div class="copied-toast" id="toast">Copied — go gently.</div>
+
+<script>
+/* ---------------- data ---------------- */
+const FEELINGS = {
+  "Sad":["Anguished","Ashamed","Guilty","Disappointed","Discouraged","Disheartened","Fragile","Hopeless","Hurt","Brokenhearted","Lonely","Miserable","Numb","Troubled","Vulnerable"],
+  "Angry":["Agitated","Annoyed","Irritated","Disgusted","Furious","Outraged","Bitter","Impatient","Jealous","Resentful","Restless","Upset"],
+  "Scared":["Alarmed","Anxious","Guarded","Terrified","Nervous","Suspicious","Overwhelmed","Panicky","Shocked","Tense","Wary","Worried"],
+  "Confused":["Bewildered","Doubtful","Frustrated","Conflicted","Hesitant","Puzzled","Rattled","Reluctant","Skeptical","Torn","Unsure","Unsettled","Uncomfortable","Uneasy"],
+  "Tired":["Burned out","Distracted","Exhausted","Depleted","Frazzled","Helpless","Indifferent","Lethargic","Weary","Off center"],
+  "Glad":["Confident","Delighted","Encouraged","Excited","Grateful","Happy","Hopeful","Eager","Inspired","Optimistic","Proud","Relieved","Satisfied"],
+  "Peaceful":["Absorbed","Calm","Comfortable","Content","Fulfilled","Relaxed","Secure","Serene"],
+  "Loving":["Affectionate","Warm","Appreciative","Moved","Nurtured","Tender","Trusting"],
+  "Playful":["Creative","Curious","Intrigued","Energetic","Exhilarated","Fascinated","Free","Invigorated","Passionate","Refreshed"]
+};
+const NEEDS = {
+  "Interdependence":["Connection","Acceptance","Appreciation","Closeness","Community","Compassion","Consideration","Cooperation","Emotional safety","Empathy","Honesty","Inclusion","Intimacy","Love","Reassurance","Respect","Support","Trust","Understanding","Warmth","To contribute"],
+  "Autonomy":["Freedom","Choice","Independence","Individuality","Self-empowerment","Solitude"],
+  "Integrity":["Self-respect","Self-worth","Authenticity","Purpose","Meaning","Honesty","Effectiveness"],
+  "Physical survival":["Rest","Relaxation","Safety","Security","Health","Food","Shelter","Touch","Consistency"],
+  "Nurturance":["Physical affection","Warmth","Tenderness","Caring","Bonding","Comfort"],
+  "Mental":["Clarity","Understanding","Awareness","Mindfulness","Stimulation","Challenge","Reflection","Wisdom"],
+  "Self-expression":["Creativity","Growth","Healing","Learning","Mastery","Teaching"],
+  "Celebration of life":["Aliveness","Delight","Excitement","Humor","Passion","Play","Pleasure","Mourning"],
+  "Spiritual energy":["Beauty","Harmony","Order","Peace","Grace","Inspiration","Equality","Mutuality"]
+};
+const EVALS = {
+  "Abandoned":{f:["Lonely","Terrified","Hurt","Sad"],n:["Connection","Belonging","Support","Caring"]},
+  "Attacked":{f:["Scared","Angry"],n:["Safety"]},
+  "Belittled":{f:["Angry","Frustrated","Tense"],n:["Respect","Autonomy","To be seen","Acknowledgement"]},
+  "Betrayed":{f:["Angry","Hurt","Disappointed","Scared"],n:["Trust","Dependability","Honesty","Commitment"]},
+  "Blamed":{f:["Angry","Scared","Confused","Hurt"],n:["Accountability","Fairness","Justice"]},
+  "Cheated":{f:["Resentful","Hurt","Angry"],n:["Honesty","Fairness","Trust"]},
+  "Coerced":{f:["Angry","Frustrated","Scared"],n:["Choice","Autonomy","Freedom"]},
+  "Criticized":{f:["Scared","Anxious","Frustrated","Embarrassed"],n:["Understanding","Acknowledgement","Acceptance"]},
+  "Disrespected":{f:["Embarrassed","Frustrated","Hurt","Annoyed"],n:["Respect","Appreciation","To be seen and valued"]},
+  "Ignored":{f:["Lonely","Scared","Hurt","Sad"],n:["Connection","Belonging","Inclusion","Participation"]},
+  "Insulted":{f:["Angry","Embarrassed"],n:["Respect","Consideration","Recognition"]},
+  "Interrupted":{f:["Angry","Frustrated","Resentful"],n:["Respect","To be heard","Consideration"]},
+  "Intimidated":{f:["Scared","Anxious"],n:["Safety","Equality","Empowerment"]},
+  "Manipulated":{f:["Angry","Scared","Powerless"],n:["Autonomy","Trust","Equality","Genuineness"]},
+  "Misunderstood":{f:["Upset","Angry","Frustrated","Discouraged"],n:["To be heard","Understanding","Clarity"]},
+  "Pressured":{f:["Anxious","Resentful","Overwhelmed"],n:["Relaxation","Clarity","Space","Ease"]},
+  "Put down":{f:["Angry","Sad","Embarrassed"],n:["Respect","Acknowledgement","Understanding"]},
+  "Rejected":{f:["Hurt","Scared","Angry"],n:["Belonging","Inclusion","Closeness","To be seen"]},
+  "Threatened":{f:["Scared","Alarmed","Agitated"],n:["Safety","Autonomy"]}
+};
+const REQ_TEXT = {
+  c1:'Could you tell me what you understand me to be saying?',
+  c2:'Could you tell me how you feel when I tell you this?',
+  a1:'Would you be willing to',
+  a2:'Would you agree to'
+};
+
+/* ---------------- state ---------------- */
+const state = { feelings:new Set(), needs:new Set(), req:null, suggestedNeeds:new Set() };
+
+/* ---------------- build chips ---------------- */
+function buildGroups(containerId, data, set, pickedId){
+  const c = document.getElementById(containerId);
+  for(const [group, items] of Object.entries(data)){
+    const g = document.createElement('div'); g.className='group';
+    g.innerHTML = `<div class="group-label">${group}</div>`;
+    const chips = document.createElement('div'); chips.className='chips';
+    items.forEach(w=>{
+      const b = document.createElement('button');
+      b.className='chip'; b.textContent=w; b.type='button';
+      b.onclick=()=>{ toggle(set,w,b); renderPicked(pickedId,set); };
+      b.dataset.word = w.toLowerCase();
+      chips.appendChild(b);
+    });
+    g.appendChild(chips); c.appendChild(g);
+  }
+}
+function toggle(set,w,btn){
+  if(set.has(w)){ set.delete(w); btn.classList.remove('sel'); }
+  else { set.add(w); btn.classList.add('sel'); }
+}
+function renderPicked(id,set){
+  const el = document.getElementById(id);
+  el.innerHTML = set.size ? [...set].map(w=>w.toLowerCase()).join(', ')
+    : '<span class="none">Nothing selected yet</span>';
+}
+buildGroups('feeling-groups', FEELINGS, state.feelings, 'picked-feelings');
+buildGroups('need-groups', NEEDS, state.needs, 'picked-needs');
+
+/* ---------------- evaluation translator ---------------- */
+const evalChips = document.getElementById('eval-chips');
+Object.keys(EVALS).forEach(word=>{
+  const b=document.createElement('button');
+  b.className='chip'; b.type='button'; b.textContent=word;
+  b.onclick=()=>showEval(word,b);
+  evalChips.appendChild(b);
+});
+let activeEvalBtn=null;
+function showEval(word,btn){
+  if(activeEvalBtn) activeEvalBtn.classList.remove('sel');
+  btn.classList.add('sel'); activeEvalBtn=btn;
+  const e=EVALS[word];
+  const r=document.getElementById('eval-result');
+  r.className='eval-result on';
+  r.innerHTML = `<h4>"${word}" translated</h4>
+    <div class="row"><b>You might be feeling:</b> ${e.f.map(x=>x.toLowerCase()).join(', ')}</div>
+    <div class="row"><b>You might be needing:</b> ${e.n.map(x=>x.toLowerCase()).join(', ')}</div>
+    <button class="apply" type="button">Add these feelings, suggest the needs</button>`;
+  r.querySelector('.apply').onclick=()=>{
+    e.f.forEach(f=>{
+      const chip=document.querySelector(`#feeling-groups .chip[data-word="${f.toLowerCase()}"]`);
+      if(chip && !state.feelings.has(chip.textContent)){ state.feelings.add(chip.textContent); chip.classList.add('sel'); }
+    });
+    e.n.forEach(n=>state.suggestedNeeds.add(n));
+    renderPicked('picked-feelings',state.feelings);
+    renderSuggestedNeeds();
+    r.querySelector('.apply').textContent='Added ✓';
+  };
+}
+function renderSuggestedNeeds(){
+  const c=document.getElementById('need-suggested');
+  if(!state.suggestedNeeds.size){ c.innerHTML=''; return; }
+  c.innerHTML=`<div class="group"><div class="group-label">Suggested from your translation</div><div class="chips" id="sn-chips"></div></div>`;
+  const chips=c.querySelector('#sn-chips');
+  [...state.suggestedNeeds].forEach(w=>{
+    const b=document.createElement('button');
+    b.className='chip'+(state.needs.has(w)?' sel':''); b.type='button'; b.textContent=w;
+    b.onclick=()=>{ toggle(state.needs,w,b); renderPicked('picked-needs',state.needs); };
+    chips.appendChild(b);
+  });
+}
+
+/* ---------------- request choice ---------------- */
+document.querySelectorAll('#req-choices .choice-card').forEach(card=>{
+  card.onclick=()=>{
+    document.querySelectorAll('#req-choices .choice-card').forEach(c=>c.classList.remove('sel'));
+    card.classList.add('sel');
+    state.req=card.dataset.req;
+    const fill=document.getElementById('action-fill');
+    if(state.req==='a1'||state.req==='a2'){
+      fill.style.display='block';
+      document.getElementById('action-prefix').textContent='"'+REQ_TEXT[state.req]+'…';
+      document.getElementById('action-text').focus();
+    } else fill.style.display='none';
+  };
+});
+
+/* ---------------- navigation ---------------- */
+const screens=['s-breath','s-1','s-2','s-3','s-4','s-5'];
+let current=0;
+function go(n){
+  document.getElementById(screens[current]).classList.remove('on');
+  document.getElementById(screens[n]).classList.add('on');
+  current=n;
+  const prog=document.getElementById('progress');
+  prog.style.display = (n>=1&&n<=4)?'flex':'none';
+  document.querySelectorAll('.progress .p').forEach(p=>{
+    const s=+p.dataset.step;
+    p.classList.toggle('active',s===n);
+    p.classList.toggle('done',s<n);
+  });
+  if(n===3) renderSuggestedNeeds();
+  if(n===5) renderStatement();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('.progress .p').forEach(p=>{
+  p.onclick=()=>{ const s=+p.dataset.step; if(s<current) go(s); };
+});
+
+/* ---------------- final statement ---------------- */
+function listJoin(arr){
+  arr=arr.map(x=>x.toLowerCase());
+  if(arr.length<=1) return arr.join('');
+  return arr.slice(0,-1).join(', ')+' and '+arr[arr.length-1];
+}
+function plainStatement(){
+  const obs=document.getElementById('obs').value.trim();
+  const f=listJoin([...state.feelings]);
+  const nds=listJoin([...state.needs]);
+  let req='';
+  if(state.req==='c1'||state.req==='c2') req=REQ_TEXT[state.req];
+  else if(state.req){
+    const a=document.getElementById('action-text').value.trim();
+    req=REQ_TEXT[state.req]+' '+(a||'______')+'?';
+  }
+  let s='When I '+(obs? 'hear you say / see you '+obs : '______')+', ';
+  s+='I feel '+(f||'______')+', ';
+  s+='because I am needing '+(nds||'______')+'. ';
+  if(req) s+=req;
+  return s;
+}
+function renderStatement(){
+  const obs=document.getElementById('obs').value.trim();
+  const f=listJoin([...state.feelings]);
+  const nds=listJoin([...state.needs]);
+  let reqHtml='';
+  if(state.req==='c1'||state.req==='c2') reqHtml='<span class="slot">'+REQ_TEXT[state.req]+'</span>';
+  else if(state.req){
+    const a=document.getElementById('action-text').value.trim();
+    reqHtml='<span class="frame">'+REQ_TEXT[state.req]+'</span> <span class="slot">'+(a?esc(a):'______')+'</span><span class="frame">?</span>';
+  }
+  const el=document.getElementById('final-statement');
+  el.innerHTML =
+    '<span class="frame">When I hear you say / see you</span> <span class="slot">'+(obs?esc(obs):'______')+'</span><span class="frame">,</span> '+
+    '<span class="frame">I feel</span> <span class="slot">'+(f||'______')+'</span><span class="frame">,</span> '+
+    '<span class="frame">because I am needing</span> <span class="slot">'+(nds||'______')+'</span><span class="frame">.</span> '+
+    reqHtml;
+  const words=plainStatement().replace(/______/g,'').trim().split(/\s+/).filter(Boolean).length;
+  const wc=document.getElementById('word-count');
+  wc.textContent=words+' words'+(words<=50?' · nice and lean':' · try trimming toward 50');
+  wc.className=words<=50?'ok':'over';
+}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+/* ---------------- copy & reset ---------------- */
+function copyStatement(){
+  const text=plainStatement();
+  const done=()=>{
+    const t=document.getElementById('toast');
+    t.classList.add('on');
+    setTimeout(()=>t.classList.remove('on'),2200);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  } else fallbackCopy(text,done);
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement('textarea');
+  ta.value=text; document.body.appendChild(ta); ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta); done();
+}
+function resetAll(){
+  state.feelings.clear(); state.needs.clear(); state.suggestedNeeds.clear(); state.req=null;
+  document.getElementById('obs').value='';
+  document.getElementById('action-text').value='';
+  document.querySelectorAll('.chip.sel').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.choice-card.sel').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('action-fill').style.display='none';
+  document.getElementById('eval-result').className='eval-result';
+  renderPicked('picked-feelings',state.feelings);
+  renderPicked('picked-needs',state.needs);
+  document.getElementById('need-suggested').innerHTML='';
+  go(0);
+}
+
+/* ---------------- breath words ---------------- */
+const bw=document.getElementById('breath-word');
+const cycle=['breathe in…','hold…','breathe out…','rest…'];
+let bi=0;
+if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  setInterval(()=>{ bi=(bi+1)%cycle.length; bw.textContent=cycle[bi]; },2000);
+}
+</script>
+</body>
+</html>
